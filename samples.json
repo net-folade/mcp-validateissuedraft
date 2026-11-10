@@ -1,0 +1,124 @@
+[
+  {
+    "name": "complete bug report",
+    "customer_message": "Hi, since this morning the billing page shows a 500 error when I click Pay. Steps: log in, go to Billing, click Pay. Account: acct_4821.",
+    "arguments": {
+      "title": "Billing page returns 500 error on Pay",
+      "priority": "p1",
+      "description": "Customer gets a 500 error on the billing page when clicking Pay, since this morning.",
+      "labels": ["bug", "billing"],
+      "reproduction_steps": "1. Log in 2. Open Billing 3. Click Pay",
+      "affected_account": "acct_4821"
+    },
+    "expect": {"ready_to_create": true, "missing_fields": [], "invalid_fields": [], "warning_count": 0}
+  },
+  {
+    "name": "angry and vague",
+    "customer_message": "YOUR APP IS BROKEN AGAIN. FIX IT!!!",
+    "arguments": {
+      "title": "Customer reports app is broken",
+      "description": "Customer says the app is broken again. No details given."
+    },
+    "expect": {"ready_to_create": false, "missing_fields": ["priority", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+  },
+  {
+    "name": "uppercase values get cleaned",
+    "customer_message": "Invoices page won't load at all for our whole team. Open Invoices and it spins forever. Account acct_7730.",
+    "arguments": {
+      "title": "Invoices page never finishes loading",
+      "priority": "P0",
+      "description": "Invoices page spins forever for the customer's whole team.",
+      "labels": ["Bug", " Billing "],
+      "reproduction_steps": "1. Log in 2. Open Invoices",
+      "affected_account": "acct_7730"
+    },
+    "expect": {"ready_to_create": true, "missing_fields": [], "invalid_fields": [], "warning_count": 3}
+  },
+  {
+    "name": "priority not allowed",
+    "customer_message": "Checkout crashes every time I add a coupon. Add item, enter coupon SAVE10, click apply. acct_1150.",
+    "arguments": {
+      "title": "Checkout crashes when applying coupon",
+      "priority": "urgent",
+      "description": "Checkout crashes every time the customer applies a coupon code.",
+      "labels": ["bug"],
+      "reproduction_steps": "1. Add item to cart 2. Enter coupon SAVE10 3. Click Apply",
+      "affected_account": "acct_1150"
+    },
+    "expect": {"ready_to_create": false, "missing_fields": [], "invalid_fields": ["priority"], "warning_count": 0}
+  },
+  {
+    "name": "label not allowed",
+    "customer_message": "The app crashes when I upload a profile photo. Settings > Profile > Upload. acct_2093.",
+    "arguments": {
+      "title": "App crashes on profile photo upload",
+      "priority": "p2",
+      "description": "The app crashes when the customer uploads a profile photo.",
+      "labels": ["bug", "crash", "mobile"],
+      "reproduction_steps": "1. Open Settings 2. Open Profile 3. Upload a photo",
+      "affected_account": "acct_2093"
+    },
+    "expect": {"ready_to_create": false, "missing_fields": [], "invalid_fields": ["labels"], "warning_count": 0}
+  },
+  {
+    "name": "blank strings count as missing",
+    "customer_message": "it doesn't work",
+    "arguments": {
+      "title": "   ",
+      "priority": "",
+      "description": "Customer says it doesn't work.",
+      "labels": [],
+      "reproduction_steps": " ",
+      "affected_account": ""
+    },
+    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+  },
+  {
+    "name": "long title and short description",
+    "customer_message": "Export to CSV gives an empty file. Reports > Export > CSV. acct_5562.",
+    "arguments": {
+      "title": "Exporting a report to CSV from the Reports page produces an empty file with no rows or headers in it",
+      "priority": "p3",
+      "description": "CSV is empty.",
+      "labels": ["bug"],
+      "reproduction_steps": "1. Open Reports 2. Click Export 3. Choose CSV",
+      "affected_account": "acct_5562"
+    },
+    "expect": {"ready_to_create": true, "missing_fields": [], "invalid_fields": [], "warning_count": 2}
+  },
+  {
+    "name": "feature request has no reproduction steps",
+    "customer_message": "Would be great if we could export reports to PDF, not just CSV. acct_3301.",
+    "arguments": {
+      "title": "Add PDF export for reports",
+      "priority": "p3",
+      "description": "Customer would like to export reports to PDF in addition to CSV.",
+      "labels": ["feature"],
+      "affected_account": "acct_3301"
+    },
+    "expect": {"ready_to_create": false, "missing_fields": ["reproduction_steps"], "invalid_fields": [], "warning_count": 0}
+  },
+  {
+    "name": "nothing sent",
+    "customer_message": "(claude called the tool with no fields)",
+    "arguments": {},
+    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "description", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+  },
+  {
+    "name": "wrong type: labels as a string",
+    "customer_message": "Billing page is slow. acct_9001.",
+    "arguments": {
+      "title": "Billing page is slow",
+      "labels": "billing"
+    },
+    "expect": {"error": "the sdk rejects it before your function runs: labels must be a list"}
+  },
+  {
+    "name": "wrong type: title as a number",
+    "customer_message": "Error 404 on the dashboard.",
+    "arguments": {
+      "title": 404
+    },
+    "expect": {"error": "the sdk rejects it before your function runs: title must be a string"}
+  }
+]

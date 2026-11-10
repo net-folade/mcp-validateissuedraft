@@ -1,0 +1,12 @@
+# python
+__pycache__/
+*.pyc
+
+# virtual environment
+.venv/
+
+# secrets (e.g. a future linear api key)
+.env
+
+# macos
+.DS_Store

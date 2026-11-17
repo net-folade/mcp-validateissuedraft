@@ -2,10 +2,63 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 from pydantic import Field, BaseModel
 
+import os 
+import httpx
+from mcp.server.mcpserver.exceptions import ToolError
+
+
+LINEAR_URL = 'https://api.linear.app/graphql'
 mcp = MCPServer('ValidateIssueDraft', log_level='ERROR')
+
+
+class LinearTeam(BaseModel):
+    id: str
+    key: str
+    name: str
+
+class TeamList(BaseModel):
+    teams: list[LinearTeam]
+
+def linear_query(query: str) -> dict:
+    '''send one graphql query to linear and return the 'data' part. raises ToolError on any failure.'''
+    key = os.environ.get('LINEAR_API_KEY')
+    if not key:
+        raise ToolError('LINEAR_API_KEY not set')
+    
+    try: 
+        r = httpx.post(LINEAR_URL, json={'query': query}, headers={'Authorization': key}, timeout=10)
+    except httpx.TimeoutException:
+        raise ToolError(f'timeout contacting linear')
+    except httpx.HTTPError as e:
+        raise ToolError(f'error contacting linear: {e}')
+    if r.status_code == 401:
+        raise ToolError(f'unauthorized contacting linear: {r.status_code} {r.text[:200]}')
+    if r.status_code != 200:
+        raise ToolError(f'error contacting linear: {r.status_code} {r.text[:200]}')
+    
+    try: 
+        body = r.json()
+    except ValueError:
+        raise ToolError(f"error contacting linear: linear replied with non-json text.")
+    if 'errors' in body:
+        raise ToolError(f"error contacting linear: {body['errors'][0]['message']}")
+    return body['data']
+
+@mcp.tool(
+    name='list_linear_teams',
+    description='list all teams in the linear workspace this api has access to. read only.'
+)
+
+def list_linear_teams() -> TeamList:
+    data = linear_query('{teams{nodes{id key name}}}')
+    teams = []
+    for node in data['teams']['nodes']:
+        teams.append(LinearTeam(id=node['id'], key=node['key'], name=node['name']))
+    return TeamList(teams=teams)
 
 ALLOWED_PRIORITIES = {'p0', 'p1', 'p2', 'p3'}
 ALLOWED_LABELS = {'bug', 'billing', 'feature', 'enhancement', 'documentation'}
+LABELS_REPRODUCIBLE = {'bug', 'billing'}
 
 class DraftReport(BaseModel):
     valid_fields: dict[str, Any]
@@ -24,7 +77,7 @@ def validate_issue_draft(
     description: str | None = Field(default=None, description='detailed description of the issue'),
     labels: list[str] | None = Field(default=None, description='list of labels for the issue. each label must be one of bug, billing, feature, enhancement, documentation'),
     reproduction_steps: str | None = Field(default=None, description='steps to reproduce the issue'),
-    affected_account: str | None = Field(default=None, description='list of affected accounts')
+    affected_account: str | None = Field(default=None, description='ID or email of the affected account')
 ) -> DraftReport:
     valid={}
     missing=[]
@@ -79,10 +132,16 @@ def validate_issue_draft(
             valid['labels']=cleaned_labels
 
     #reproduction_steps
+    needs_steps = False
+    for label in valid.get('labels', []):
+        if label in LABELS_REPRODUCIBLE: needs_steps = True
     if reproduction_steps is None or reproduction_steps.strip()=='':
-        missing.append('reproduction_steps')
+        if needs_steps == True:
+            missing.append('reproduction_steps')
     else:
-        valid['reproduction_steps']=reproduction_steps.strip()
+       valid['reproduction_steps']=reproduction_steps.strip()
+        
+
 
     #affected_account
     if affected_account is None or affected_account.strip()=='':

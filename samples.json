@@ -19,7 +19,7 @@
       "title": "Customer reports app is broken",
       "description": "Customer says the app is broken again. No details given."
     },
-    "expect": {"ready_to_create": false, "missing_fields": ["priority", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+    "expect": {"ready_to_create": false, "missing_fields": ["priority", "labels", "affected_account"], "invalid_fields": [], "warning_count": 0}
   },
   {
     "name": "uppercase values get cleaned",
@@ -71,7 +71,7 @@
       "reproduction_steps": " ",
       "affected_account": ""
     },
-    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "labels", "affected_account"], "invalid_fields": [], "warning_count": 0}
   },
   {
     "name": "long title and short description",
@@ -96,13 +96,13 @@
       "labels": ["feature"],
       "affected_account": "acct_3301"
     },
-    "expect": {"ready_to_create": false, "missing_fields": ["reproduction_steps"], "invalid_fields": [], "warning_count": 0}
+    "expect": {"ready_to_create": true, "missing_fields": [], "invalid_fields": [], "warning_count": 0}
   },
   {
     "name": "nothing sent",
     "customer_message": "(claude called the tool with no fields)",
     "arguments": {},
-    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "description", "labels", "reproduction_steps", "affected_account"], "invalid_fields": [], "warning_count": 0}
+    "expect": {"ready_to_create": false, "missing_fields": ["title", "priority", "description", "labels", "affected_account"], "invalid_fields": [], "warning_count": 0}
   },
   {
     "name": "wrong type: labels as a string",
